@@ -1,22 +1,7 @@
-// lib/modul02/studi_kasus/ruang_praktikum.dart
-
 import 'package:flutter/material.dart';
 
 import '../../../models/room_session.dart';
 
-/// Screen studi kasus "RuangKita - Dashboard Ketersediaan Ruang".
-///
-/// Sesi 5 fokus:
-/// - Overflow testing: `mainAxisExtent` grid dibuat **dinamis** dari
-///   `MediaQuery.textScalerOf(context)` supaya tinggi cell mengikuti
-///   skala teks pengguna.
-/// - Material 3: skema warna mengalir dari `ColorScheme.fromSeed`
-///   di `main.dart`; semua warna di file ini mengambil dari
-///   `Theme.of(context).colorScheme`.
-/// - Light/Dark Mode: tombol toggle di AppBar memanggil callback
-///   yang disediakan root (`_RuangKitaAppState._toggleTheme`).
-///
-/// Filter (ChoiceChip) + Bottom Sheet (detail card) dari Sesi 4 tetap.
 class RuangPraktikumScreen extends StatefulWidget {
   const RuangPraktikumScreen({
     super.key,
@@ -24,10 +9,8 @@ class RuangPraktikumScreen extends StatefulWidget {
     required this.onToggleTheme,
   });
 
-  /// Mode tema aktif dari root. Dipakai untuk memilih ikon toggle.
   final ThemeMode themeMode;
 
-  /// Callback untuk mengubah tema. Dipanggil saat IconButton ditekan.
   final VoidCallback onToggleTheme;
 
   @override
@@ -35,10 +18,8 @@ class RuangPraktikumScreen extends StatefulWidget {
 }
 
 class _RuangPraktikumScreenState extends State<RuangPraktikumScreen> {
-  /// Filter status. `null` berarti tampilkan semua.
   RoomStatus? _selectedStatus;
 
-  /// Daftar sesi yang ditampilkan setelah difilter.
   List<RoomSession> get _visibleSessions {
     final RoomStatus? filter = _selectedStatus;
     if (filter == null) return kDummyRoomSessions;
@@ -100,10 +81,6 @@ class _RuangPraktikumScreenState extends State<RuangPraktikumScreen> {
   }
 }
 
-// =====================================================================
-// Filter bar — Wrap + ChoiceChip.
-// =====================================================================
-
 class _FilterBar extends StatelessWidget {
   const _FilterBar({
     required this.selected,
@@ -139,10 +116,6 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
-// =====================================================================
-// Compact layout — 1 kolom vertikal untuk width < 600 dp.
-// =====================================================================
-
 class _CompactLayout extends StatelessWidget {
   const _CompactLayout({required this.sessions});
 
@@ -165,10 +138,6 @@ class _CompactLayout extends StatelessWidget {
   }
 }
 
-// =====================================================================
-// Medium layout — grid 2 kolom.
-// =====================================================================
-
 class _MediumLayout extends StatelessWidget {
   const _MediumLayout({required this.sessions});
 
@@ -188,10 +157,6 @@ class _MediumLayout extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Expanded layout — 2 kolom + panel ringkasan.
-// =====================================================================
 
 class _ExpandedLayout extends StatelessWidget {
   const _ExpandedLayout({required this.sessions});
@@ -225,10 +190,6 @@ class _ExpandedLayout extends StatelessWidget {
   }
 }
 
-// =====================================================================
-// Empty state.
-// =====================================================================
-
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
@@ -258,10 +219,6 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Grid helper — fix overflow: mainAxisExtent dinamis dari textScaler.
-// =====================================================================
 
 class _RoomGrid extends StatelessWidget {
   const _RoomGrid({
@@ -294,10 +251,6 @@ class _RoomGrid extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Panel ringkasan — hanya tampil di expanded.
-// =====================================================================
 
 class _SummaryPanel extends StatelessWidget {
   const _SummaryPanel({required this.sessions});
@@ -398,10 +351,6 @@ class _SummaryRow extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Card.
-// =====================================================================
 
 class _RoomCard extends StatelessWidget {
   const _RoomCard({
@@ -523,10 +472,6 @@ class _RoomCard extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Bottom sheet detail.
-// =====================================================================
 
 class _RoomDetailSheet extends StatefulWidget {
   const _RoomDetailSheet({required this.session});
@@ -679,10 +624,6 @@ class _DetailRow extends StatelessWidget {
     );
   }
 }
-
-// =====================================================================
-// Badge status — pakai warna eksplisit supaya kontras di Light & Dark.
-// =====================================================================
 
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({required this.status});

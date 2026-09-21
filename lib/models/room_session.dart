@@ -9,9 +9,7 @@ enum RoomStatus {
   /// Label tampilan untuk UI.
   final String label;
 }
-
-/// Kategori ruang/fasilitas sesuai varian NIM digit terakhir 7
-/// (Ruang Rapat & Coworking).
+    
 enum RoomCategory {
   ruangRapat('Ruang Rapat'),
   ruangDiskusi('Ruang Diskusi'),
@@ -22,10 +20,6 @@ enum RoomCategory {
   final String label;
 }
 
-/// Model satu sesi penggunaan ruang.
-///
-/// Semua data UI diambil dari objek ini, tidak ditulis ulang
-/// langsung di dalam widget Card.
 class RoomSession {
   const RoomSession({
     required this.id,

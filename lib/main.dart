@@ -1,17 +1,9 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 
 import 'modul02/studi_kasus/ruang_praktikum.dart';
 
 void main() => runApp(const RuangKitaApp());
 
-/// Root aplikasi RuangKita.
-///
-/// StatefulWidget dipakai untuk menyimpan [ThemeMode] (Light/Dark).
-/// Perubahan mode memicu rebuild `MaterialApp` sehingga `themeMode`
-/// di `MaterialApp` ikut berubah, dan seluruh subtree (termasuk halaman
-/// studi kasus) di-rebuild dengan ColorScheme baru.
 class RuangKitaApp extends StatefulWidget {
   const RuangKitaApp({super.key});
 
@@ -20,8 +12,6 @@ class RuangKitaApp extends StatefulWidget {
 }
 
 class _RuangKitaAppState extends State<RuangKitaApp> {
-  /// Mode tema aktif. Mulai dari Light agar screenshot default
-  /// konsisten; user dapat mengubah lewat tombol di AppBar.
   ThemeMode _themeMode = ThemeMode.light;
 
   void _toggleTheme() {
@@ -34,8 +24,6 @@ class _RuangKitaAppState extends State<RuangKitaApp> {
 
   @override
   Widget build(BuildContext context) {
-    // Seed color terpusat. Nilai ini menjadi dasar seluruh palette
-    // Material 3 (primary, secondary, surface, onSurface, dst).
     const Color seedColor = Colors.indigo;
 
     final ColorScheme lightScheme = ColorScheme.fromSeed(
@@ -47,12 +35,18 @@ class _RuangKitaAppState extends State<RuangKitaApp> {
       brightness: Brightness.dark,
     );
 
-    return MaterialApp(
+        return MaterialApp(
       title: 'RuangKita',
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
-      theme: ThemeData(useMaterial3: true, colorScheme: lightScheme),
-      darkTheme: ThemeData(useMaterial3: true, colorScheme: darkScheme),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: lightScheme,
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: darkScheme,
+      ),
       home: RuangPraktikumScreen(
         themeMode: _themeMode,
         onToggleTheme: _toggleTheme,
