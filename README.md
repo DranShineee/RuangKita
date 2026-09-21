@@ -1,12 +1,12 @@
 # RuangKita — Dashboard Ketersediaan Ruang
 
-Tugas Rumah Modul 02 — Declarative UI & Responsive Layout
-Pemrograman Perangkat Bergerak
+Tugas Rumah Modul 02 — Declarative UI & Responsive Layout  
+Pemrograman Perangkat Bergerak  
 
-Nama  : Khairan Adiokta Arun Nugraha
-NIM   : 362558302097
-Kode  : M02-2097
-Varian: Ruang Rapat & Coworking 
+Nama  : Khairan Adiokta Arun Nugraha  
+NIM   : 362558302097  
+Kode  : M02-2097  
+Varian: Ruang Rapat & Coworking   
 
 ---
 
@@ -29,18 +29,18 @@ Fitur yang ada:
 
 ## Struktur file
 
-  lib/
-  ├── main.dart
-  ├── models/
-  │   └── room_session.dart
-  └── modul02/
-      └── studi_kasus/
-          └── ruang_praktikum.dart
-  screenshots/
-  ├── 01_mobile_light.png
-  ├── 02_tablet.png
-  ├── 03_expanded.png
-  └── 04_dark_mode.png
+  lib/  
+  ├── main.dart  
+  ├── models/  
+  │   └── room_session.dart  
+  └── modul02/  
+      └── studi_kasus/  
+          └── ruang_praktikum.dart  
+  screenshots/  
+  ├── 01_mobile_light.png  
+  ├── 02_tablet.png  
+  ├── 03_expanded.png  
+  └── 04_dark_mode.png  
 
 ---
 
@@ -51,28 +51,28 @@ ada di `models/room_session.dart`. UI-nya di `ruang_praktikum.dart`.
 
 Alur widget utama:
 
-  MaterialApp
-  └── RuangPraktikumScreen (StatefulWidget)
-      └── Scaffold
-          ├── AppBar (judul M02-2097 + tombol toggle tema)
-          └── Column
-              ├── _FilterBar (Wrap + ChoiceChip)
-              └── Expanded → LayoutBuilder
-                  ├── < 600 dp  → _CompactLayout (ListView)
-                  ├── 600-839   → _MediumLayout (GridView 2 kolom)
-                  └── >= 840    → _ExpandedLayout (grid + panel ringkasan)
+  MaterialApp  
+  └── RuangPraktikumScreen (StatefulWidget)  
+      └── Scaffold  
+          ├── AppBar (judul M02-2097 + tombol toggle tema)  
+          └── Column  
+              ├── _FilterBar (Wrap + ChoiceChip)  
+              └── Expanded → LayoutBuilder  
+                  ├── < 600 dp  → _CompactLayout (ListView)  
+                  ├── 600-839   → _MediumLayout (GridView 2 kolom)  
+                  └── >= 840    → _ExpandedLayout (grid + panel ringkasan)  
 
 Setiap card:
 
-  Stack
-  ├── Card → InkWell → Padding → Column
-  │   ├── Row (ikon + Expanded nama ruang)
-  │   ├── Text kegiatan (maxLines 2, ellipsis)
-  │   ├── Text deskripsi (maxLines 2, ellipsis)
-  │   └── Row (waktu + kapasitas, pake Flexible)
-  └── Positioned (badge status di kanan atas)
+  Stack  
+  ├── Card → InkWell → Padding → Column  
+  │   ├── Row (ikon + Expanded nama ruang)  
+  │   ├── Text kegiatan (maxLines 2, ellipsis)  
+  │   ├── Text deskripsi (maxLines 2, ellipsis)  
+  │   └── Row (waktu + kapasitas, pake Flexible)  
+  └── Positioned (badge status di kanan atas)  
 
-**Kenapa StatefulWidget?**
+**Kenapa StatefulWidget?**  
 Karena halaman utama menyimpan state yang berubah: filter yang dipilih
 user (`_selectedStatus`) dan mode tema (`_themeMode` di root). Tiap
 perubahan panggil `setState()` biar UI-nya rebuild. jika memakai
@@ -98,10 +98,10 @@ global).
 
 | File | Viewport | Tema |
 |---|---|---|
-| 01_mobile_light.png | 360 x 800 | Light |
-| 02_tablet.png | 720 x 1024 | Light |
-| 03_expanded.png | 1024 x 800 | Light |
-| 04_dark_mode.png | 360 x 800 | Dark |
+| ![mobile](screenshots/01_mobile_light.png) | 360 x 800 | Light |
+| ![mobile](screenshots/02_tablet.png) | 720 x 1024 | Light |
+| ![mobile](screenshots/03_expanded.png) | 1024 x 800 | Light |
+| ![mobile](screenshots/04_dark_mode.png) | 360 x 800 | Dark |
 
 ---
 
