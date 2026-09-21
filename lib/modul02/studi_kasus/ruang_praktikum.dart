@@ -6,16 +6,29 @@ import '../../../models/room_session.dart';
 
 /// Screen studi kasus "RuangKita - Dashboard Ketersediaan Ruang".
 ///
-/// Sesi 4 fokus:
-/// - Filter status memakai Wrap + ChoiceChip + setState.
-/// - Tap card membuka showModalBottomSheet berisi detail lengkap.
-/// - Satu kontrol UI lokal di dalam bottom sheet (Switch "Ingatkan saya").
+/// Sesi 5 fokus:
+/// - Overflow testing: `mainAxisExtent` grid dibuat **dinamis** dari
+///   `MediaQuery.textScalerOf(context)` supaya tinggi cell mengikuti
+///   skala teks pengguna.
+/// - Material 3: skema warna mengalir dari `ColorScheme.fromSeed`
+///   di `main.dart`; semua warna di file ini mengambil dari
+///   `Theme.of(context).colorScheme`.
+/// - Light/Dark Mode: tombol toggle di AppBar memanggil callback
+///   yang disediakan root (`_RuangKitaAppState._toggleTheme`).
 ///
-/// Filter otomatis berlaku untuk ketiga layout (compact/medium/expanded)
-/// karena `sessions` disalurkan sebagai parameter, bukan diambil ulang
-/// dari `kDummyRoomSessions` di dalam layout.
+/// Filter (ChoiceChip) + Bottom Sheet (detail card) dari Sesi 4 tetap.
 class RuangPraktikumScreen extends StatefulWidget {
-  const RuangPraktikumScreen({super.key});
+  const RuangPraktikumScreen({
+    super.key,
+    required this.themeMode,
+    required this.onToggleTheme,
+  });
+
+  /// Mode tema aktif dari root. Dipakai untuk memilih ikon toggle.
+  final ThemeMode themeMode;
+
+  /// Callback untuk mengubah tema. Dipanggil saat IconButton ditekan.
+  final VoidCallback onToggleTheme;
 
   @override
   State<RuangPraktikumScreen> createState() => _RuangPraktikumScreenState();
@@ -43,21 +56,29 @@ class _RuangPraktikumScreenState extends State<RuangPraktikumScreen> {
   @override
   Widget build(BuildContext context) {
     final List<RoomSession> sessions = _visibleSessions;
+    final bool isDark = widget.themeMode == ThemeMode.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('M02-2097 — RuangKita'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode',
+            onPressed: widget.onToggleTheme,
+            icon: Icon(
+              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            ),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // Filter bar di atas — sama untuk semua kelas lebar.
           _FilterBar(
             selected: _selectedStatus,
             onChanged: _onFilterChanged,
           ),
           const SizedBox(height: 12),
-          // Area responsif mengambil sisa tinggi yang tersedia.
           Expanded(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
@@ -89,16 +110,11 @@ class _FilterBar extends StatelessWidget {
     required this.onChanged,
   });
 
-  /// Status yang sedang aktif. `null` = "Semua".
   final RoomStatus? selected;
-
-  /// Callback dipanggil saat chip berubah.
   final ValueChanged<RoomStatus?> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    // Wrap dipakai supaya chip otomatis turun ke baris berikutnya di
-    // layar sempit. Modul secara eksplisit mengizinkan filter wrap.
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Wrap(
@@ -150,7 +166,7 @@ class _CompactLayout extends StatelessWidget {
 }
 
 // =====================================================================
-// Medium layout — grid 2 kolom untuk width 600-839 dp.
+// Medium layout — grid 2 kolom.
 // =====================================================================
 
 class _MediumLayout extends StatelessWidget {
@@ -174,7 +190,7 @@ class _MediumLayout extends StatelessWidget {
 }
 
 // =====================================================================
-// Expanded layout — 2 kolom + panel ringkasan untuk width >= 840 dp.
+// Expanded layout — 2 kolom + panel ringkasan.
 // =====================================================================
 
 class _ExpandedLayout extends StatelessWidget {
@@ -199,9 +215,6 @@ class _ExpandedLayout extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: 16),
-          // Panel ringkasan ikut menampilkan hasil filter.
-          // Jadi saat filter "Berlangsung" dipilih, panel ini
-          // otomatis menunjukkan sebaran 1 kegiatan saja.
           Expanded(
             flex: 2,
             child: _SummaryPanel(sessions: sessions),
@@ -213,7 +226,7 @@ class _ExpandedLayout extends StatelessWidget {
 }
 
 // =====================================================================
-// Empty state — muncul kalau filter tidak menghasilkan record.
+// Empty state.
 // =====================================================================
 
 class _EmptyState extends StatelessWidget {
@@ -247,7 +260,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 // =====================================================================
-// Grid helper — dipakai medium dan expanded.
+// Grid helper — fix overflow: mainAxisExtent dinamis dari textScaler.
 // =====================================================================
 
 class _RoomGrid extends StatelessWidget {
@@ -261,13 +274,18 @@ class _RoomGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double scale =
+        MediaQuery.textScalerOf(context).scale(1.0).clamp(1.0, 1.6);
+    const double baseHeight = 224.0;
+    final double cellHeight = baseHeight * scale;
+
     return GridView.builder(
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        mainAxisExtent: 224,
+        mainAxisExtent: cellHeight,
       ),
       itemCount: sessions.length,
       itemBuilder: (BuildContext context, int index) {
@@ -382,7 +400,7 @@ class _SummaryRow extends StatelessWidget {
 }
 
 // =====================================================================
-// Card — sekarang bisa ditap untuk membuka bottom sheet.
+// Card.
 // =====================================================================
 
 class _RoomCard extends StatelessWidget {
@@ -397,10 +415,7 @@ class _RoomCard extends StatelessWidget {
   void _openDetail(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      // Drag handle di atas sheet supaya user tahu bisa di-drag turun.
       showDragHandle: true,
-      // isScrollControlled supaya sheet bisa lebih dari 50% tinggi layar
-      // saat isi detail panjang.
       isScrollControlled: true,
       builder: (BuildContext sheetContext) {
         return _RoomDetailSheet(session: session);
@@ -418,8 +433,6 @@ class _RoomCard extends StatelessWidget {
       children: <Widget>[
         Card(
           clipBehavior: Clip.antiAlias,
-          // InkWell harus berada di dalam Card (Material ancestor)
-          // supaya ripple-nya tampil rapi.
           child: InkWell(
             onTap: () => _openDetail(context),
             child: Padding(
@@ -525,8 +538,6 @@ class _RoomDetailSheet extends StatefulWidget {
 }
 
 class _RoomDetailSheetState extends State<_RoomDetailSheet> {
-  /// State lokal bottom sheet — benar-benar berfungsi (tidak dikirim
-  /// ke backend), cukup untuk memenuhi syarat "kontrol UI lokal".
   bool _reminderOn = false;
 
   @override
@@ -542,7 +553,6 @@ class _RoomDetailSheetState extends State<_RoomDetailSheet> {
           20,
           8,
           20,
-          // Tambahan ruang untuk keyboard di mobile.
           20 + MediaQuery.of(context).viewInsets.bottom,
         ),
         child: SingleChildScrollView(
@@ -550,7 +560,6 @@ class _RoomDetailSheetState extends State<_RoomDetailSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              // Judul + badge status.
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -572,8 +581,6 @@ class _RoomDetailSheetState extends State<_RoomDetailSheet> {
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
-
-              // Detail baris: kategori, waktu, lokasi, kapasitas.
               _DetailRow(
                 icon: _categoryIcon(s.category),
                 label: 'Kategori',
@@ -594,9 +601,7 @@ class _RoomDetailSheetState extends State<_RoomDetailSheet> {
                 label: 'Kapasitas',
                 value: '${s.capacity} orang',
               ),
-
               const Divider(height: 32),
-
               Text(
                 'Deskripsi',
                 style: theme.textTheme.titleSmall
@@ -605,15 +610,10 @@ class _RoomDetailSheetState extends State<_RoomDetailSheet> {
               const SizedBox(height: 6),
               Text(
                 s.description,
-                // Di dalam bottom sheet, deskripsi ditampilkan penuh
-                // (tanpa ellipsis) supaya semua informasi terbaca.
                 style: theme.textTheme.bodyMedium
                     ?.copyWith(color: scheme.onSurfaceVariant),
               ),
-
               const Divider(height: 32),
-
-              // Kontrol UI lokal — benar-benar berfungsi via setState.
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 value: _reminderOn,
@@ -667,8 +667,6 @@ class _DetailRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          // Expanded supaya value panjang (mis. deskripsi status)
-          // aman dari RenderFlex overflow.
           Expanded(
             child: Text(
               value,
@@ -683,7 +681,7 @@ class _DetailRow extends StatelessWidget {
 }
 
 // =====================================================================
-// Badge status.
+// Badge status — pakai warna eksplisit supaya kontras di Light & Dark.
 // =====================================================================
 
 class _StatusBadge extends StatelessWidget {
